@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "Cook'd and Bomb'd Ignore Topics",
+  "short_name": "CaB Ignore Topics",
+  "description": "Ignore topics and forums, and other topic list tweaks",
+  "homepage_url": "https://github.com/insin/cookdandbombd-ignore-topics",
+  "version": "1.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "64": "icons/icon64.png",
+    "96": "icons/icon96.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.cookdandbombd.co.uk/forums/index.php/board*",
+        "https://www.cookdandbombd.co.uk/forums/index.php?action=unread*"
+      ],
+      "js": [
+        "./cookdandbombdignoretopics.user.js"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "options.html"
+  },
+  "permissions": [
+    "contextMenus",
+    "storage"
+  ]
+}
