@@ -4,8 +4,8 @@
 
 Ignore topics and forums, and other topic list tweaks.
 
-* [Install Chrome Extension]() (TBD)
-* [Install Firefox Add-on]() (TBD)
+* [Install Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/cookd-and-bombd-ignore-topics/)
+* [Install Chrome Extension](https://chrome.google.com/webstore/detail/bigpbodobkhbhhmjchjndlfgpigchpjh/)
 * [Install as a user script](https://greasyfork.org/en/scripts/406588-cook-d-and-bomb-d-ignore-topics) (requires a [user script manager](https://greasyfork.org/en#home-step-1))
 
 ## Ignoring
