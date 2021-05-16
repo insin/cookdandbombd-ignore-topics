@@ -32,4 +32,9 @@ Ignored topics will be displayed with a fetching salmon highlight and clicking t
 
 By default, this extension also hides topic page number links in the Recent Unread Topics view and makes topic links go to the first unread post (when available).
 
-These can be configured in its options.
+These can be configured in its options:
+
+
+| Firefox | Chrome |
+|:-------:|:------:|
+| ![Screenshot of the extension options in Firefox](screenshots/firefox_options.png) | ![Screenshot of the extension options in Chrome](screenshots/chrome_options.png) |
