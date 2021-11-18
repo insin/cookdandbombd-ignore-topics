@@ -2,8 +2,8 @@
 // @name        Cook'd and Bomb'd Ignore Topics
 // @description Ignore topics and forums, and other topic list tweaks
 // @namespace   https://github.com/insin/greasemonkey/
-// @version     6
-// @match       https://www.cookdandbombd.co.uk/forums/index.php/board*
+// @version     7
+// @match       https://www.cookdandbombd.co.uk/forums/index.php?board*
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?action=unread*
 // @grant       GM.registerMenuCommand
 // ==/UserScript==
@@ -11,11 +11,8 @@
 const IGNORED_TOPICS_STORAGE = 'cab_ignoredTopics'
 const IGNORED_FORUMS_STORAGE = 'cab_ignoredForums'
 
-// Logged out: index.php/topic,12345
-// Logged in: index.php?topic=12345
-const TOPIC_ID_RE = /index.php[?/]topic[,=](\d+)/
-// Only in Recent Unread Topics - must be logged in
-const FORUM_ID_RE = /index.php\/board,(\d+)/
+const TOPIC_ID_RE = /index\.php\?topic=(\d+)/
+const FORUM_ID_RE = /index\.php\?board=(\d+)/
 
 let topics = []
 
@@ -27,7 +24,6 @@ let config = {
   // Set this to false if you're done hiding forums in Recent Unread Topics
   showIgnoreForumControl: true,
   showIgnoredTopics: false,
-  topicLinksNewPost: true,
 }
 
 function loadIgnoreConfig() {
@@ -79,16 +75,16 @@ function ForumPage() {
     .cab_ignoreControl {
       visibility: hidden;
     }
-    .cab_ignored {
+    #topic_container .windowbg.cab_ignored {
       display: none;
     }
-    .cab_ignored.cab_show {
-      display: table-row;
+    #topic_container .windowbg.cab_ignored.cab_show {
+      display: flex;
     }
-    .cab_ignored.cab_show td {
-      background-color: #fdd !important;
+    #topic_container .windowbg.cab_ignored.cab_show {
+      background-color: #311212 !important;
     }
-    tr:hover .cab_ignoreControl {
+    #topic_container > div:hover .cab_ignoreControl {
       visibility: visible;
     }
     .cab_ignoredForum .cab_ignoreTopic {
@@ -100,14 +96,14 @@ function ForumPage() {
     .cab_ignoredTopic.cab_ignoredForum .cab_ignoreForum {
       display: inline;
     }
-    ${isRecentUnreadTopicsPage && config.hideRecentUnreadTopicsPageNumbers ? 'td.subject small { display: none; }' : ''}
+    ${isRecentUnreadTopicsPage && config.hideRecentUnreadTopicsPageNumbers ? '.topic_pages { display: none; }' : ''}
   `)
 
   function Topic($topicRow) {
-    let $topicLink = $topicRow.querySelector('td.subject a')
+    let $topicLink = $topicRow.querySelector('.info :is(.recent_title, .message_index_title) .preview a')
     // Only in Recent Unread Topics
-    let $forumLink = $topicRow.querySelector('td.subject p > em > a')
-    let $lastPostLink = $topicRow.querySelector('td.lastpost a')
+    let $forumLink = $topicRow.querySelector('.floatleft em a')
+    let $lastPostLink = $topicRow.querySelector('.lastpost a')
 
     let topicIdMatch = TOPIC_ID_RE.exec($lastPostLink.href)
     if (!topicIdMatch) {
@@ -135,8 +131,8 @@ function ForumPage() {
     }
 
     $lastPostLink.insertAdjacentHTML('afterend', `
-      <a href="#" class="cab_ignoreControl cab_ignoreTopic">
-        <img src="/forums/Themes/default/images/icons/delete.gif" alt="Ignore topic" title="Ignore topic" width="14" height="14">
+      <a href="#" class="cab_ignoreControl cab_ignoreTopic" title="Ignore topic">
+        <span class="main_icons ignore"></span>
       </a>
     `)
 
@@ -147,21 +143,14 @@ function ForumPage() {
 
     if (config.showIgnoreForumControl && forumId) {
       $forumLink.parentElement.insertAdjacentHTML('afterend', `
-        <a href="#" class="cab_ignoreControl cab_ignoreForum">
-          <img src="/forums/Themes/default/images/icons/delete.gif" alt="Ignore forum" title="Ignore forum" width="14" height="14">
+        <a href="#" class="cab_ignoreControl cab_ignoreForum" title="Ignore forum">
+          <span class="main_icons ignore"></span>
         </a>
       `)
       $topicRow.querySelector('a.cab_ignoreForum').addEventListener('click', (e) => {
         e.preventDefault()
         toggleIgnoreForum(forumId)
       })
-    }
-
-    if (config.topicLinksNewPost) {
-      let $newPostLink = $topicRow.querySelector('a[id^=newicon]')
-      if ($newPostLink) {
-        $topicLink.href = $newPostLink.href
-      }
     }
 
     return api
@@ -179,7 +168,7 @@ function ForumPage() {
     topic.updateClassNames()
   }
 
-  Array.from(document.querySelectorAll('#main_content_section table.table_grid tbody tr'), processTopicRow)
+  Array.from(document.querySelectorAll('#topic_container > div'), processTopicRow)
 }
 
 // Already-processed pages seem to be getting cached on back navigation... sometimes
