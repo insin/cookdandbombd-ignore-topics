@@ -4,6 +4,7 @@ let config = {
   hideRecentUnreadTopicsPageNumbers: true,
   showIgnoreForumControl: true,
   showIgnoredTopics: false,
+  topicLinksNewPost: true,
 }
 
 chrome.storage.local.get((storedConfig) => {

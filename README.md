@@ -30,9 +30,9 @@ Ignored topics will be displayed with a fetching reddish highlight and clicking 
 
 ## Other Tweaks
 
-By default, this extension also hides topic page number links in the Recent Unread Topics view.
+By default, this extension also hides topic page number links in the Recent Unread Topics view and makes topic links go to the first unread post (when available).
 
-This can be configured in its options:
+These can be configured in its options:
 
 | Firefox | Chrome |
 |:-------:|:------:|

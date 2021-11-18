@@ -9,6 +9,7 @@
     "ignoreFiles": [
       "icons/chrome-web-store-icon.png",
       "icons/icon.png",
+      "jsconfig.json",
       "package.json",
       "README.md",
       "screenshots/"

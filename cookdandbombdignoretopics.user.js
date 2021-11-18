@@ -2,7 +2,7 @@
 // @name        Cook'd and Bomb'd Ignore Topics
 // @description Ignore topics and forums, and other topic list tweaks
 // @namespace   https://github.com/insin/greasemonkey/
-// @version     7
+// @version     8
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?board*
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?action=unread*
 // @grant       GM.registerMenuCommand
@@ -24,6 +24,7 @@ let config = {
   // Set this to false if you're done hiding forums in Recent Unread Topics
   showIgnoreForumControl: true,
   showIgnoredTopics: false,
+  topicLinksNewPost: true,
 }
 
 function loadIgnoreConfig() {
@@ -151,6 +152,13 @@ function ForumPage() {
         e.preventDefault()
         toggleIgnoreForum(forumId)
       })
+    }
+
+    if (config.topicLinksNewPost) {
+      let $newPostLink = $topicRow.querySelector('a[id^=newicon]')
+      if ($newPostLink) {
+        $topicLink.href = $newPostLink.href
+      }
     }
 
     return api
