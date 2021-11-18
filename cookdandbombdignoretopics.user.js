@@ -2,7 +2,7 @@
 // @name        Cook'd and Bomb'd Ignore Topics
 // @description Ignore topics and forums, and other topic list tweaks
 // @namespace   https://github.com/insin/greasemonkey/
-// @version     8
+// @version     9
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?board*
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?action=unread*
 // @grant       GM.registerMenuCommand
@@ -83,7 +83,7 @@ function ForumPage() {
       display: flex;
     }
     #topic_container .windowbg.cab_ignored.cab_show {
-      background-color: #311212 !important;
+      background-color: #fdd !important;
     }
     #topic_container > div:hover .cab_ignoreControl {
       visibility: visible;
