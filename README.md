@@ -24,7 +24,7 @@ If you've accidentally ignored the wrong thing, or if you realise you want to re
 |:-------:|:------:|
 | ![Screenshot of the 'Show ignored topics' menu item in Firefox](screenshots/firefox_context_menu.png) | ![Screenshot of the 'Show ignored topics' menu item in Chrome](screenshots/chrome_context_menu.png) |
 
-Ignored topics will be displayed with a fetching salmon highlight and clicking the appropriate ignore icon on them (you may have ignored a topic individually, by forum or both) will unignore them. You can then re-hide ignored topics using the same menu item.
+Ignored topics will be displayed and clicking the appropriate ignore icon on them (you may have ignored a topic individually, by forum or both) will unignore them. You can then re-hide ignored topics using the same menu item.
 
 ![Screenshot of ignored topics being shown in Recent Unread Topics](screenshots/showing_ignored_topics.png)
 
