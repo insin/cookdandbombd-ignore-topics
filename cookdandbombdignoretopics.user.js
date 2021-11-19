@@ -2,7 +2,7 @@
 // @name        Cook'd and Bomb'd Ignore Topics
 // @description Ignore topics and forums, and other topic list tweaks
 // @namespace   https://github.com/insin/greasemonkey/
-// @version     10
+// @version     11
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?board*
 // @match       https://www.cookdandbombd.co.uk/forums/index.php?action=unread*
 // @grant       GM.registerMenuCommand
@@ -70,36 +70,6 @@ function addStyle(css) {
 }
 
 function ForumPage() {
-  let isRecentUnreadTopicsPage = location.search.includes('action=unread')
-
-  addStyle(`
-    .cab_ignoreControl {
-      visibility: hidden;
-    }
-    #topic_container .windowbg.cab_ignored {
-      display: none;
-    }
-    #topic_container .windowbg.cab_ignored.cab_show {
-      display: flex;
-    }
-    #topic_container .windowbg.cab_ignored.cab_show {
-      background-color: #ddd !important;
-    }
-    #topic_container > div:hover .cab_ignoreControl {
-      visibility: visible;
-    }
-    .cab_ignoredForum .cab_ignoreTopic {
-      display: none;
-    }
-    .cab_ignoredTopic .cab_ignoreForum {
-      display: none;
-    }
-    .cab_ignoredTopic.cab_ignoredForum .cab_ignoreForum {
-      display: inline;
-    }
-    ${isRecentUnreadTopicsPage && config.hideRecentUnreadTopicsPageNumbers ? '.topic_pages { display: none; }' : ''}
-  `)
-
   function Topic($topicRow) {
     let $topicLink = $topicRow.querySelector('.info :is(.recent_title, .message_index_title) .preview a')
     // Only in Recent Unread Topics
@@ -121,6 +91,10 @@ function ForumPage() {
     }
 
     let api = {
+      $el: $topicRow,
+      isIgnored() {
+        return ignoredTopicIds.includes(topicId) || (forumId ? ignoredForumIds.includes(forumId) : false)
+      },
       updateClassNames() {
         let isTopicIgnored = ignoredTopicIds.includes(topicId)
         let isForumIgnored = forumId ? ignoredForumIds.includes(forumId) : false
@@ -140,6 +114,7 @@ function ForumPage() {
     $topicRow.querySelector('a.cab_ignoreTopic').addEventListener('click', (e) => {
       e.preventDefault()
       toggleIgnoreTopic(topicId, api)
+      reStripeTopics()
     })
 
     if (config.showIgnoreForumControl && forumId) {
@@ -151,6 +126,7 @@ function ForumPage() {
       $topicRow.querySelector('a.cab_ignoreForum').addEventListener('click', (e) => {
         e.preventDefault()
         toggleIgnoreForum(forumId)
+        reStripeTopics()
       })
     }
 
@@ -176,7 +152,64 @@ function ForumPage() {
     topic.updateClassNames()
   }
 
-  Array.from(document.querySelectorAll('#topic_container > div'), processTopicRow)
+  /**
+   * Topics being hidden breaks the CSS nth-of-type striping.
+   */
+  function reStripeTopics() {
+    let odd = true
+    topics.forEach(topic => {
+      if (!topic.isIgnored()) {
+        topic.$el.classList.toggle('odd', odd)
+        topic.$el.classList.toggle('even', !odd)
+        odd = !odd
+      } else {
+        topic.$el.classList.remove('odd')
+        topic.$el.classList.remove('even')
+      }
+    })
+  }
+
+  let topicElements = Array.from(document.querySelectorAll('#topic_container > div'))
+  let oddBg = topicElements[0] ? getComputedStyle(topicElements[0]).backgroundColor : null
+  let evenBg = topicElements[1] ? getComputedStyle(topicElements[1]).backgroundColor : null
+  let isRecentUnreadTopicsPage = location.search.includes('action=unread')
+
+  addStyle(`
+    .cab_ignoreControl {
+      visibility: hidden;
+    }
+    #topic_container .windowbg.cab_ignored {
+      display: none;
+    }
+    #topic_container .windowbg.cab_ignored.cab_show {
+      display: flex;
+    }
+    ${oddBg ? `#topic_container .windowbg.odd {
+      background-color: ${oddBg};
+    }` : ''}
+    ${evenBg ? `#topic_container .windowbg.even {
+      background-color: ${evenBg};
+    }` : ''}
+    #topic_container .windowbg.cab_ignored.cab_show {
+      background-color: #ddd !important;
+    }
+    #topic_container > div:hover .cab_ignoreControl {
+      visibility: visible;
+    }
+    .cab_ignoredForum .cab_ignoreTopic {
+      display: none;
+    }
+    .cab_ignoredTopic .cab_ignoreForum {
+      display: none;
+    }
+    .cab_ignoredTopic.cab_ignoredForum .cab_ignoreForum {
+      display: inline;
+    }
+    ${isRecentUnreadTopicsPage && config.hideRecentUnreadTopicsPageNumbers ? '.topic_pages { display: none; }' : ''}
+  `)
+
+  topicElements.forEach(processTopicRow)
+  reStripeTopics()
 }
 
 // Already-processed pages seem to be getting cached on back navigation... sometimes
