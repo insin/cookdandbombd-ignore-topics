@@ -14,5 +14,10 @@
       "README.md",
       "screenshots/"
     ]
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.x",
+    "@types/greasemonkey": "4.x",
+    "web-ext": "6.x"
   }
 }

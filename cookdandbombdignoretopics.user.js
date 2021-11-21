@@ -8,15 +8,25 @@
 // @grant       GM.registerMenuCommand
 // ==/UserScript==
 
+/**
+ * @typedef {{
+ *   $el: HTMLDivElement
+ *   isIgnored(): boolean
+ *   updateClassNames(): void
+ * }} Topic
+ */
+
 const IGNORED_TOPICS_STORAGE = 'cab_ignoredTopics'
 const IGNORED_FORUMS_STORAGE = 'cab_ignoredForums'
 
 const TOPIC_ID_RE = /index\.php\?topic=(\d+)/
 const FORUM_ID_RE = /index\.php\?board=(\d+)/
 
+/** @type {Topic[]} */
 let topics = []
-
+/** @type {string[]} */
 let ignoredTopicIds
+/** @type {string[]} */
 let ignoredForumIds
 
 let config = {
@@ -28,12 +38,14 @@ let config = {
 }
 
 function loadIgnoreConfig() {
-  let ignoredTopicsJson = localStorage[IGNORED_TOPICS_STORAGE]
-  let ignoredForumsJson = localStorage[IGNORED_FORUMS_STORAGE]
-  ignoredTopicIds = ignoredTopicsJson ? JSON.parse(ignoredTopicsJson) : []
-  ignoredForumIds = ignoredForumsJson ? JSON.parse(ignoredForumsJson) : []
+  ignoredTopicIds = JSON.parse(localStorage[IGNORED_TOPICS_STORAGE] || '[]')
+  ignoredForumIds = JSON.parse(localStorage[IGNORED_FORUMS_STORAGE] || '[]')
 }
 
+/**
+ * @param {string} id
+ * @param {Topic} topic
+ */
 function toggleIgnoreTopic(id, topic) {
   if (!ignoredTopicIds.includes(id)) {
     ignoredTopicIds.unshift(id)
@@ -46,6 +58,9 @@ function toggleIgnoreTopic(id, topic) {
   topic.updateClassNames()
 }
 
+/**
+ * @param {string} id
+ */
 function toggleIgnoreForum(id) {
   if (!ignoredForumIds.includes(id)) {
     ignoredForumIds.unshift(id)
@@ -58,11 +73,17 @@ function toggleIgnoreForum(id) {
   topics.forEach(topic => topic.updateClassNames())
 }
 
+/**
+ * @param {boolean} showIgnoredTopics
+ */
 function toggleShowIgnoredTopics(showIgnoredTopics) {
   config.showIgnoredTopics = showIgnoredTopics
   topics.forEach(topic => topic.updateClassNames())
 }
 
+/**
+ * @param {string} css
+ */
 function addStyle(css) {
   let $style = document.createElement('style')
   $style.appendChild(document.createTextNode(css))
@@ -70,11 +91,15 @@ function addStyle(css) {
 }
 
 function ForumPage() {
+  /**
+   * @param {HTMLDivElement} $topicRow
+   * @returns {Topic}
+   */
   function Topic($topicRow) {
-    let $topicLink = $topicRow.querySelector('.info :is(.recent_title, .message_index_title) .preview a')
+    let $topicLink = /** @type {HTMLAnchorElement} */ ($topicRow.querySelector('.info :is(.recent_title, .message_index_title) .preview a'))
     // Only in Recent Unread Topics
-    let $forumLink = $topicRow.querySelector('.floatleft em a')
-    let $lastPostLink = $topicRow.querySelector('.lastpost a')
+    let $forumLink = /** @type {HTMLAnchorElement} */ ($topicRow.querySelector('.floatleft em a'))
+    let $lastPostLink = /** @type {HTMLAnchorElement} */ ($topicRow.querySelector('.lastpost a'))
 
     let topicIdMatch = TOPIC_ID_RE.exec($lastPostLink.href)
     if (!topicIdMatch) {
@@ -131,7 +156,7 @@ function ForumPage() {
     }
 
     if (config.topicLinksNewPost) {
-      let $newPostLink = $topicRow.querySelector('a[id^=newicon]')
+      let $newPostLink = /** @type {HTMLAnchorElement} */ ($topicRow.querySelector('a[id^=newicon]'))
       if ($newPostLink) {
         $topicLink.href = $newPostLink.href
       }
@@ -142,6 +167,7 @@ function ForumPage() {
 
   /**
    * Add ignore controls to a topic and hide it if it's being ignored.
+   * @param {HTMLDivElement} $topicRow
    */
   function processTopicRow($topicRow) {
     let topic = Topic($topicRow)
